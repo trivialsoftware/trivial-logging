@@ -26,6 +26,9 @@ var logger = logging.loggerFor(module);
 logger.info('Hello, World!');
 ```
 
+By default, this sets up a single `stdout` stream, logging at either `'debug'`, or whatever you've set the `LOG_LEVEL`
+environment variable to.
+
 ## Advanced Usage
 
 We support passing in a configuration object to setup your logging streams. Then, all calls to `getLogger()` and/or
@@ -36,12 +39,14 @@ var logging = require('trivial-logging');
 
 var config = {
     debug: true,
-    streams: [
-        {
-            stream: process.stdout,
-            level: "info"
-        }
-    ]
+    logging: {
+        streams: [
+            {
+                stream: process.stdout,
+                level: "info"
+            }
+        ]
+    }
 };
 
 // This stores the configuration

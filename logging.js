@@ -28,20 +28,23 @@ class LoggingService {
         this.streams = [
             {
                 stream: process.stdout,
-                level: "debug"
+                level: process.env.LOG_LEVEL || "debug"
             }
         ];
     } // end constructor
 
-    init(config)
+    init(config={})
     {
-        this.streams = _.map(config.logging.streams, (stream) =>
+        // Pull out the streams config, with sane defaults.
+        var streams = ((config.logging || config).streams) || this.streams;
+
+        this.streams = _.map(streams, (stream) =>
         {
             // We only _ever_ override the process.stdout steam.
             if(stream.stream == process.stdout)
             {
                 // Override the level if `LOG_LEVEL` is set
-                var level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : stream.level;
+                var level = process.env.LOG_LEVEL || stream.level;
 
                 // Override the logging level if `config.debug` is set
                 stream.level = config.debug ? 'debug' : level;
