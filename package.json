@@ -1,6 +1,6 @@
 {
   "name": "trivial-logging",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple wrapper around bunyan that provides some convenience.",
   "main": "logging.js",
   "scripts": {
@@ -11,7 +11,9 @@
     "logging",
     "trivial"
   ],
-  "engines" : { "node" : ">=6.0.0" },
+  "engines": {
+    "node": ">=6.0.0"
+  },
   "repository": "trivialsoftware/trivial-logging",
   "author": "Christopher S. Case <chris.case@g33xnexus.com>",
   "license": "MIT",
