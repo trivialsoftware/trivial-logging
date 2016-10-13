@@ -43,11 +43,20 @@ class LoggingService {
             // We only _ever_ override the process.stdout steam.
             if(stream.stream == process.stdout)
             {
-                // Override the level if `LOG_LEVEL` is set
-                var level = process.env.LOG_LEVEL || stream.level;
-
-                // Override the logging level if `config.debug` is set
-                stream.level = config.debug ? 'debug' : level;
+                if(process.env.LOG_LEVEL)
+                {
+                    // Override the level if `LOG_LEVEL` is set
+                    stream.level = process.env.LOG_LEVEL;
+                }
+                else
+                {
+                    // Override the logging level if `config.debug` is set and we are not already at a lower logging
+                    // level.
+                    if(stream.level != 'trace')
+                    {
+                        stream.level = config.debug ? 'debug' : stream.level;
+                    } // end if
+                } // end if
             } // end if
 
             return stream;
