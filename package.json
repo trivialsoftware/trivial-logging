@@ -1,6 +1,6 @@
 {
   "name": "trivial-logging",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple wrapper around bunyan that provides some convenience.",
   "main": "logging.js",
   "scripts": {
