@@ -89,4 +89,15 @@ This gets a new child logger of the root logger, passing in the streams we've be
 
 Creates a logger, appending a `module` object with either the name of the object, or a path to it. (It will attempt to
 get the filename of the object if the object has a `filename` property.) This makes it most useful for making loggers
-for module objects, but can be usedon any arbitrary object.
+for module objects, but can be used on any arbitrary object.
+
+## `dump(object, color, depth)`
+
+* `object` - the object you wish to print
+* `colors` - should the object be printed with color escapes (default: `true`)
+* `depth` - how deeply nested should we print the properties of the object (default: `null`)
+* `showHidden` - should we print hidden properties (default: `false`)
+
+This is basically just a wrapper around [util.inspect](https://nodejs.org/api/util.html#util_util_inspect_object_options).
+It's here for convenience, but doesn't have the same flexibility as `util.inspect`, so should only be used sparingly.
+

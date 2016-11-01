@@ -4,10 +4,11 @@
 // @module
 //----------------------------------------------------------------------------------------------------------------------
 
-var path = require('path');
+const { inspect } = require('util');
+const path = require('path');
 
-var _ = require('lodash');
-var logging = require('bunyan');
+const _ = require('lodash');
+const logging = require('bunyan');
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -103,6 +104,11 @@ class LoggingService {
         // Create a child logger, specifying the module we're logging for.
         return this.root.child({ module: moduleName })
     } // end loggerFor
+
+    dump(obj, colors=true, depth=null, showHidden=false)
+    {
+        return inspect(obj, { colors, depth, showHidden });
+    } // end dump
 } // end LoggingService
 
 //----------------------------------------------------------------------------------------------------------------------
