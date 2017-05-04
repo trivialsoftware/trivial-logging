@@ -34,6 +34,14 @@ class LoggingService {
         ];
     } // end constructor
 
+    _modLogger(logger)
+    {
+        if(!logger.dump)
+        {
+            logger.dump = this.dump;
+        } // end if
+    } // end _modLogger
+
     init(config={})
     {
         // Pull out the streams config, with sane defaults.
@@ -69,7 +77,7 @@ class LoggingService {
 
     setRootLogger(name='root', options)
     {
-        this.root = this.getLogger(name, options);
+        this.root = this._modLogger(this.getLogger(name, options));
     } // end setRootLogger
 
     getLogger(name, options)
@@ -79,7 +87,7 @@ class LoggingService {
             streams: this.streams
         }, options);
 
-        return logging.createLogger(options);
+        return this._modLogger(logging.createLogger(options));
     } // end getLogger
 
     loggerFor(obj)
@@ -102,7 +110,7 @@ class LoggingService {
         } //end if
 
         // Create a child logger, specifying the module we're logging for.
-        return this.root.child({ module: moduleName })
+        return this._modLogger(this.root.child({ module: moduleName }));
     } // end loggerFor
 
     dump(obj, colors=true, depth=null, showHidden=false)
