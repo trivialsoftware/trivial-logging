@@ -13,6 +13,13 @@ brace-expansion@^1.0.0:
     balanced-match "^0.4.1"
     concat-map "0.0.1"
 
+bunyan-debug-stream@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/bunyan-debug-stream/-/bunyan-debug-stream-1.0.8.tgz#df612852d5d0b6d6df3f30214d8a7e4ee925106d"
+  dependencies:
+    colors "^1.0.3"
+    exception-formatter "^1.0.4"
+
 bunyan@^1.8.1:
   version "1.8.10"
   resolved "https://registry.yarnpkg.com/bunyan/-/bunyan-1.8.10.tgz#201fedd26c7080b632f416072f53a90b9a52981c"
@@ -21,6 +28,10 @@ bunyan@^1.8.1:
     moment "^2.10.6"
     mv "~2"
     safe-json-stringify "~1"
+
+colors@^1.0.3:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/colors/-/colors-1.1.2.tgz#168a4701756b6a7f51a12ce0c97bfa28c084ed63"
 
 concat-map@0.0.1:
   version "0.0.1"
@@ -31,6 +42,12 @@ dtrace-provider@~0.8:
   resolved "https://registry.yarnpkg.com/dtrace-provider/-/dtrace-provider-0.8.1.tgz#cd4d174a233bea1bcf4a1fbfa5798f44f48cda9f"
   dependencies:
     nan "^2.3.3"
+
+exception-formatter@^1.0.4:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/exception-formatter/-/exception-formatter-1.0.5.tgz#bda957319789cbabdf36848fb5288c59634b73a5"
+  dependencies:
+    colors "^1.0.3"
 
 glob@^6.0.1:
   version "6.0.4"

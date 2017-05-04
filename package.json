@@ -19,6 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "bunyan": "^1.8.1",
+    "bunyan-debug-stream": "^1.0.8",
     "lodash": "^4.15.0"
   }
 }

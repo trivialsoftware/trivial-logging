@@ -9,6 +9,7 @@ const path = require('path');
 
 const _ = require('lodash');
 const logging = require('bunyan');
+const bunyanDebugStream = require('bunyan-debug-stream');
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -58,14 +59,25 @@ class LoggingService {
                 {
                     // Override the level if `LOG_LEVEL` is set
                     stream.level = process.env.LOG_LEVEL;
-                }
-                else
+                } // end if
+
+                // If 'debug' is true, we do some fancy stuff.
+                if(config.debug)
                 {
                     // Override the logging level if `config.debug` is set and we are not already at a lower logging
                     // level.
                     if(stream.level !== 'trace')
                     {
                         stream.level = config.debug ? 'debug' : stream.level;
+                    } // end if
+
+                    // If you haven't turned off the `debugStream` option, we replace your standard stream with a pretty
+                    // debug stream, so you don't have to pipe through the bunyan cli tool.
+                    if(config.debugStream !== false)
+                    {
+                        stream.type = 'raw';
+                        stream.serializers = bunyanDebugStream.serializers;
+                        stream.stream = bunyanDebugStream({ basepath: this.mainDir, forceColor: true });
                     } // end if
                 } // end if
             } // end if
