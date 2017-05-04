@@ -10,6 +10,7 @@ const path = require('path');
 const _ = require('lodash');
 const logging = require('bunyan');
 const bunyanDebugStream = require('bunyan-debug-stream');
+const colors = require('colors');
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +67,7 @@ class LoggingService {
                 {
                     // Override the logging level if `config.debug` is set and we are not already at a lower logging
                     // level.
-                    if(stream.level !== 'trace')
+                    if(stream.level.toLowerCase() !== 'trace')
                     {
                         stream.level = config.debug ? 'debug' : stream.level;
                     } // end if
@@ -77,7 +78,18 @@ class LoggingService {
                     {
                         stream.type = 'raw';
                         stream.serializers = bunyanDebugStream.serializers;
-                        stream.stream = bunyanDebugStream({ basepath: this.mainDir, forceColor: true });
+                        stream.stream = bunyanDebugStream({
+                            basepath: this.mainDir,
+                            forceColor: true,
+                            showPid: false,
+                            colors: {
+                                'debug': 'white',
+                                'info': 'cyan',
+                            },
+                            prefixers: {
+                                module: (moduleName, options) => options.useColor ? colors.white(moduleName) : moduleName
+                            }
+                        });
                     } // end if
                 } // end if
             } // end if
