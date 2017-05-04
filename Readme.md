@@ -63,10 +63,18 @@ var overriddenLogger = logging.getLogger('overridden', { streams: [ /* ... */ ] 
 
 ### `init(config)`
 
-* `config` - a configuration object with the keys `debug` or `streams`.
+* `config` - a configuration object with the keys `debug` and/or `streams`.
 
 This sets up all future loggers with a default set of streams, as passed by the configuration. If `debug` is true, it
-will force the `stdout` stream to log at debug, regardless of it's configuration. This is useful for debugging.
+will force the `stdout` stream to log at _at least_ `DEBUG`, regardless of it's configuration. (This is useful for debugging.)
+
+In addition, if `debug` and `debugStream` are `true` then we use [bunyan-debug-stream][] in place of `stdout`. The
+reason for this is simple: it's a pain (and sometimes not possible) to do `| bunyan` everywhere. This allows for
+beautiful debug logging, without much hassle, while still letting you shut off the pretty output when you deploy.
+
+_Note: You may also use the env variable `DEBUG_STREAM=TRUE` or `PRETTY=TRUE` to turn on the pretty debug stream._
+
+[bunyan-debug-stream]: https://github.com/benbria/bunyan-debug-stream
 
 ### `setRootLogger(name)`
 
@@ -100,4 +108,6 @@ for module objects, but can be used on any arbitrary object.
 
 This is basically just a wrapper around [util.inspect](https://nodejs.org/api/util.html#util_util_inspect_object_options).
 It's here for convenience, but doesn't have the same flexibility as `util.inspect`, so should only be used sparingly.
+
+_Note: This is added to all logging instances for your convenience._
 
