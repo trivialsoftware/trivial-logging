@@ -72,9 +72,10 @@ class LoggingService {
                         stream.level = config.debug ? 'debug' : stream.level;
                     } // end if
 
-                    // If you haven't turned off the `debugStream` option, we replace your standard stream with a pretty
+                    // If you have turned on the `debugStream` option, we replace your standard stream with a pretty
                     // debug stream, so you don't have to pipe through the bunyan cli tool.
-                    if(config.debugStream !== false)
+                    const debugStream = ((process.env.DEBUG_STREAM || '').toLowerCase() === 'true') || ((process.env.PRETTY || '').toLowerCase() === 'true') || config.debugStream;
+                    if(debugStream)
                     {
                         stream.type = 'raw';
                         stream.serializers = bunyanDebugStream.serializers;
