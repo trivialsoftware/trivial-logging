@@ -45,12 +45,12 @@ class LoggingService {
     init(config={})
     {
         // Pull out the streams config, with sane defaults.
-        var streams = ((config.logging || config).streams) || this.streams;
+        const streams = ((config.logging || config).streams) || this.streams;
 
         this.streams = _.map(streams, (stream) =>
         {
             // We only _ever_ override the process.stdout steam.
-            if(stream.stream == process.stdout)
+            if(stream.stream === process.stdout)
             {
                 if(process.env.LOG_LEVEL)
                 {
@@ -61,7 +61,7 @@ class LoggingService {
                 {
                     // Override the logging level if `config.debug` is set and we are not already at a lower logging
                     // level.
-                    if(stream.level != 'trace')
+                    if(stream.level !== 'trace')
                     {
                         stream.level = config.debug ? 'debug' : stream.level;
                     } // end if
@@ -92,17 +92,15 @@ class LoggingService {
 
     loggerFor(obj)
     {
-        var filename;
-        if(typeof obj == 'object' && obj.constructor.name == 'Module')
+        let filename;
+        if(typeof obj === 'object' && obj.constructor.name === 'Module')
         {
             filename = obj.filename;
         }
-        else if(typeof obj == 'string')
+        else if(typeof obj === 'string')
         {
             filename = obj;
         } // end if
-
-        var moduleName = path.relative(this.mainDir, filename);
 
         if(!this.root)
         {
@@ -110,6 +108,7 @@ class LoggingService {
         } //end if
 
         // Create a child logger, specifying the module we're logging for.
+        const moduleName = path.relative(this.mainDir, filename);
         return this._modLogger(this.root.child({ module: moduleName }));
     } // end loggerFor
 
