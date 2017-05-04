@@ -40,6 +40,8 @@ class LoggingService {
         {
             logger.dump = this.dump;
         } // end if
+
+        return logger;
     } // end _modLogger
 
     init(config={})
