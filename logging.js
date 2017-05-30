@@ -74,7 +74,7 @@ class LoggingService {
 
                     // If you have turned on the `debugStream` option, we replace your standard stream with a pretty
                     // debug stream, so you don't have to pipe through the bunyan cli tool.
-                    const debugStream = ((process.env.DEBUG_STREAM || '').toLowerCase() === 'true') || ((process.env.PRETTY || '').toLowerCase() === 'true') || config.debugStream;
+                    const debugStream = _.get(config, 'debugStream', config.debug);
                     if(debugStream)
                     {
                         stream.type = 'raw';

@@ -19,8 +19,8 @@ npm install trivial-logging
 In order to get basic logging going, you don't have to do anything:
 
 ```javascript
-var logging = require('trivial-logging');
-var logger = logging.loggerFor(module);
+const logging = require('trivial-logging');
+const logger = logging.loggerFor(module);
 
 // This is just a bunyan logger instance
 logger.info('Hello, World!');
@@ -35,9 +35,9 @@ We support passing in a configuration object to setup your logging streams. Then
 `loggerFor()` will use that configuration.
 
 ```javascript
-var logging = require('trivial-logging');
+const logging = require('trivial-logging');
 
-var config = {
+const config = {
     debug: true,
     logging: {
         streams: [
@@ -53,10 +53,10 @@ var config = {
 logging.init(config);
 
 // This gets a basic logger
-var basicLogger = logging.getLogger('basic');
+const basicLogger = logging.getLogger('basic');
 
 // This gets a logger that has some options overridden
-var overriddenLogger = logging.getLogger('overridden', { streams: [ /* ... */ ] });
+const overriddenLogger = logging.getLogger('overridden', { streams: [ /* ... */ ] });
 ```
 
 ## API
@@ -66,13 +66,13 @@ var overriddenLogger = logging.getLogger('overridden', { streams: [ /* ... */ ] 
 * `config` - a configuration object with the keys `debug` and/or `streams`.
 
 This sets up all future loggers with a default set of streams, as passed by the configuration. If `debug` is true, it
-will force the `stdout` stream to log at _at least_ `DEBUG`, regardless of it's configuration. (This is useful for debugging.)
+will force the `stdout` stream to log at _at least_ `DEBUG`, regardless of it's configuration. (This is useful for
+debugging.)
 
-In addition, if `debug` and `debugStream` are `true` then we use [bunyan-debug-stream][] in place of `stdout`. The
-reason for this is simple: it's a pain (and sometimes not possible) to do `| bunyan` everywhere. This allows for
-beautiful debug logging, without much hassle, while still letting you shut off the pretty output when you deploy.
-
-_Note: You may also use the env variable `DEBUG_STREAM=TRUE` or `PRETTY=TRUE` to turn on the pretty debug stream._
+In addition, if `debug` is true and `debugStream` is either `true` or `undefined` then we use [bunyan-debug-stream][]
+in place of `stdout`. The reason for this is simple: it's a pain (and sometimes not possible) to do `| bunyan`
+everywhere. This allows for beautiful debug logging, without much hassle, while still letting you shut off the pretty
+output when you deploy.
 
 [bunyan-debug-stream]: https://github.com/benbria/bunyan-debug-stream
 
