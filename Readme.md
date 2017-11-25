@@ -59,6 +59,21 @@ const basicLogger = logging.getLogger('basic');
 const overriddenLogger = logging.getLogger('overridden', { streams: [ /* ... */ ] });
 ```
 
+#### Usage with Unit Tests
+
+Generally, when you're running unit tests, you don't want most logging. The easiest way to achieve this is by setting the `LOG_LEVEL` environment variable to `'ERROR'`. You can do this at the top of your unit test:
+
+```javascript
+// Set `LOG_LEVEL` before importing your code that imports `trivial-logging`
+process.env.LOG_LEVEL = 'ERROR';
+
+const { expect } = require('chai');
+
+// ... rest of unit test
+```
+
+Make sure that you set `process.env.LOG_LEVEL` _before_ importing any code that imports `trivial-logging`.
+
 ## API
 
 ### `init(config)`
