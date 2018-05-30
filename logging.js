@@ -28,6 +28,11 @@ class LoggingService {
             this.mainDir = process.cwd();
         } // end try
 
+        if(process.env.LOG_NULL)
+        {
+            logging = require('./lib/nullLogger');
+        } // end if
+
         // Setup default streams
         this.streams = [
             {
