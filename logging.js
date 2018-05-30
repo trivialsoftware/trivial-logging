@@ -8,9 +8,10 @@ const { inspect } = require('util');
 const path = require('path');
 
 const _ = require('lodash');
-const logging = require('bunyan');
 const bunyanDebugStream = require('bunyan-debug-stream');
 const colors = require('colors');
+
+let logging = require('bunyan');
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +27,11 @@ class LoggingService {
             // If you're requiring this from an interactive session, use the current working directory instead.
             this.mainDir = process.cwd();
         } // end try
+
+        if(process.env.LOG_NULL)
+        {
+            logging = require('./lib/nullLogger');
+        } // end if
 
         // Setup default streams
         this.streams = [
@@ -50,6 +56,11 @@ class LoggingService {
     {
         // Pull out the streams config, with sane defaults.
         const streams = ((config.logging || config).streams) || this.streams;
+
+        if(config.nullLogger)
+        {
+            logging = require('./lib/nullLogger');
+        } // end if
 
         this.streams = _.map(streams, (stream) =>
         {
