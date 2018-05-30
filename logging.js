@@ -8,9 +8,10 @@ const { inspect } = require('util');
 const path = require('path');
 
 const _ = require('lodash');
-const logging = require('bunyan');
 const bunyanDebugStream = require('bunyan-debug-stream');
 const colors = require('colors');
+
+let logging = require('bunyan');
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +51,11 @@ class LoggingService {
     {
         // Pull out the streams config, with sane defaults.
         const streams = ((config.logging || config).streams) || this.streams;
+
+        if(config.nullLogger)
+        {
+            logging = require('./lib/nullLogger');
+        } // end if
 
         this.streams = _.map(streams, (stream) =>
         {
