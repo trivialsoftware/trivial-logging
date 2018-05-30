@@ -59,9 +59,10 @@ const basicLogger = logging.getLogger('basic');
 const overriddenLogger = logging.getLogger('overridden', { streams: [ /* ... */ ] });
 ```
 
-#### Usage with Unit Tests
+### Usage with Unit Tests
 
-Generally, when you're running unit tests, you don't want most logging. The easiest way to achieve this is by setting the `LOG_LEVEL` environment variable to `'ERROR'`. You can do this at the top of your unit test:
+Generally, when you're running unit tests, you don't want most logging. The easiest way to achieve this is by setting
+the `LOG_LEVEL` environment variable to `'ERROR'`. You can do this at the top of your unit test:
 
 ```javascript
 // Set `LOG_LEVEL` before importing your code that imports `trivial-logging`
@@ -73,6 +74,37 @@ const { expect } = require('chai');
 ```
 
 Make sure that you set `process.env.LOG_LEVEL` _before_ importing any code that imports `trivial-logging`.
+
+### Null Logger (Disabling all logging)
+
+Trivial Logging has a `NullLogger` implementation. This turns all logging operations into a noop. This means that there
+will be no output, and very little overhead from logging calls. This is helpful with debugging, or for unit tests.
+
+This can be enabled by setting `LOG_NULL` to any value. For example:
+
+```bash
+$ env LOG_NULL="true" node ./example.js
+```
+
+This can also be enabled via the config file, with the `nullLogger` property being set to true:
+
+```javascript
+const logging = require('trivial-logging');
+
+const config = {
+    nullLogger: true
+};
+
+// This stores the configuration
+logging.init(config);
+
+// This gets a null logger
+const logger = logging.getLogger('some logger');
+
+// All calls to this logger are noops
+logger.info("Some logging.");
+logger.fatal("Some other logging.");
+```
 
 ## API
 
