@@ -6,7 +6,7 @@ const logging  = require('../logging');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-logging.init({ debugStream: true, level: debug, nullLogger: true });
+logging.init({ debug: true, nullLogger: true });
 logging.setRootLogger('example');
 
 //----------------------------------------------------------------------------------------------------------------------

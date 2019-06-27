@@ -67,6 +67,7 @@ class LoggingService {
     {
         // Pull out the streams config, with sane defaults.
         const streams = ((config.logging || config).streams) || this.streams;
+        config.level = config.level || (config.debug ? 'debug' : 'info');
 
         if(config.nullLogger)
         {
