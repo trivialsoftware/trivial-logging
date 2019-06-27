@@ -15,6 +15,17 @@ let logging = require('bunyan');
 
 //----------------------------------------------------------------------------------------------------------------------
 
+const logLevels = {
+    fatal: 60,
+    error: 50,
+    warn: 40,
+    info: 30,
+    debug: 20,
+    trace: 10
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
 class LoggingService {
     constructor()
     {
@@ -73,36 +84,34 @@ class LoggingService {
                     stream.level = process.env.LOG_LEVEL;
                 } // end if
 
-                // If 'debug' is true, we do some fancy stuff.
-                if(config.debug)
+                if(config.level)
                 {
-                    // Override the logging level if `config.debug` is set and we are not already at a lower logging
+                    // Override the logging level if `config.level` is set and we are not already at a lower logging
                     // level.
-                    if(stream.level.toLowerCase() !== 'trace')
-                    {
-                        stream.level = config.debug ? 'debug' : stream.level;
-                    } // end if
+                    const streamLevel = logLevels[stream.level.toLowerCase()];
+                    const configLevel = logLevels[config.level.toLowerCase()];
+                    stream.level = configLevel < streamLevel ? config.level : stream.level;
+                } // end if
 
-                    // If you have turned on the `debugStream` option, we replace your standard stream with a pretty
-                    // debug stream, so you don't have to pipe through the bunyan cli tool.
-                    const debugStream = _.get(config, 'debugStream', config.debug);
-                    if(debugStream)
-                    {
-                        stream.type = 'raw';
-                        stream.serializers = bunyanDebugStream.serializers;
-                        stream.stream = bunyanDebugStream({
-                            basepath: this.mainDir,
-                            forceColor: true,
-                            showPid: false,
-                            colors: {
-                                'debug': 'white',
-                                'info': 'cyan',
-                            },
-                            prefixers: {
-                                module: (moduleName, options) => options.useColor ? colors.white(moduleName) : moduleName
-                            }
-                        });
-                    } // end if
+                // If you have turned on the `debugStream` option, we replace your standard stream with a pretty
+                // debug stream, so you don't have to pipe through the bunyan cli tool.
+                const debugStream = _.get(config, 'debugStream', config.debug);
+                if(debugStream)
+                {
+                    stream.type = 'raw';
+                    stream.serializers = bunyanDebugStream.serializers;
+                    stream.stream = bunyanDebugStream({
+                        basepath: this.mainDir,
+                        forceColor: true,
+                        showPid: false,
+                        colors: {
+                            'debug': 'white',
+                            'info': 'cyan',
+                        },
+                        prefixers: {
+                            module: (moduleName, options) => options.useColor ? colors.white(moduleName) : moduleName
+                        }
+                    });
                 } // end if
             } // end if
 

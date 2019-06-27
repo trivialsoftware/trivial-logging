@@ -110,16 +110,13 @@ logger.fatal("Some other logging.");
 
 ### `init(config)`
 
-* `config` - a configuration object with the keys `debug` and/or `streams`.
+* `config` - a configuration object with the keys `level`, `debugSteam` and/or `streams`.
 
-This sets up all future loggers with a default set of streams, as passed by the configuration. If `debug` is true, it
-will force the `stdout` stream to log at _at least_ `DEBUG`, regardless of it's configuration. (This is useful for
-debugging.)
+This sets up all future loggers with a default set of streams, as passed by the configuration. If `config.level` is a valid logging level, it will force the `stdout` stream to log at _the lowest level_, either the stream's config, or the level specified by `config.level`.
 
-In addition, if `debug` is true and `debugStream` is either `true` or `undefined` then we use [bunyan-debug-stream][]
-in place of `stdout`. The reason for this is simple: it's a pain (and sometimes not possible) to do `| bunyan`
-everywhere. This allows for beautiful debug logging, without much hassle, while still letting you shut off the pretty
-output when you deploy.
+In addition, if `config.debugStream` (or if not present, `config.debug`) is either `true` or `undefined` then we use [bunyan-debug-stream][] in place of `stdout`. The reason for this is simple: it's a pain (and sometimes not possible) to do `| bunyan` everywhere. This allows for beautiful debug logging, without much hassle, while still letting you shut off the pretty output when you deploy.
+
+_Note: the `LOG_LEVEL` environment variable **always** overrides what's set in the config._
 
 [bunyan-debug-stream]: https://github.com/benbria/bunyan-debug-stream
 
