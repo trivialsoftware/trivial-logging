@@ -1,28 +1,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Trivial Logging
-//
-// @module
 //----------------------------------------------------------------------------------------------------------------------
 
 const { inspect } = require('util');
 const path = require('path');
 
-const _ = require('lodash');
-const bunyanDebugStream = require('bunyan-debug-stream');
-const colors = require('colors');
+// Pino
+const pino = require('pino');
 
-let logging = require('bunyan');
-
-//----------------------------------------------------------------------------------------------------------------------
-
-const logLevels = {
-    fatal: 60,
-    error: 50,
-    warn: 40,
-    info: 30,
-    debug: 20,
-    trace: 10
-};
+// Null Logger
+const NullLogger = require('./lib/nullLogger');
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -39,18 +26,12 @@ class LoggingService {
             this.mainDir = process.cwd();
         } // end try
 
-        if(process.env.LOG_NULL)
-        {
-            logging = require('./lib/nullLogger');
-        } // end if
-
-        // Setup default streams
-        this.streams = [
-            {
-                stream: process.stdout,
-                level: process.env.LOG_LEVEL || "debug"
-            }
-        ];
+        this._config = {
+            nullLogger: !!process.env.LOG_NULL,
+            options: {
+                level: (process.env.LOG_LEVEL || 'debug').toLowerCase()
+            },
+        };
     } // end constructor
 
     _modLogger(logger)
@@ -60,82 +41,78 @@ class LoggingService {
             logger.dump = this.dump;
         } // end if
 
+        // Modify logger functions to handle errors correctly.
+        this._modLogFunc('warn', logger);
+        this._modLogFunc('error', logger);
+
         return logger;
     } // end _modLogger
 
-    init(config={})
+    _modLogFunc(funcName, logger)
     {
-        // Pull out the streams config, with sane defaults.
-        const streams = ((config.logging || config).streams) || this.streams;
-        config.level = config.level || (config.debug ? 'debug' : 'info');
-
-        if(config.nullLogger)
+        const origFunc = logger[funcName];
+        logger[funcName] = function (...args)
         {
-            logging = require('./lib/nullLogger');
-        } // end if
-
-        this.streams = _.map(streams, (stream) =>
-        {
-            // We only _ever_ override the process.stdout steam.
-            if(stream.stream === process.stdout)
+            args = args.map((arg) =>
             {
-                if(process.env.LOG_LEVEL)
+                if(arg instanceof Error)
                 {
-                    // Override the level if `LOG_LEVEL` is set
-                    stream.level = process.env.LOG_LEVEL;
+                    if(arg.toJSON)
+                    {
+                        return arg.toJSON();
+                    }
+                    else
+                    {
+                        return {
+                            code: arg.code,
+                            message: arg.message,
+                            stack: arg.stack
+                        };
+                    } // end if
                 } // end if
 
-                if(config.level)
-                {
-                    // Override the logging level if `config.level` is set and we are not already at a lower logging
-                    // level.
-                    const streamLevel = logLevels[stream.level.toLowerCase()];
-                    const configLevel = logLevels[config.level.toLowerCase()];
-                    stream.level = configLevel < streamLevel ? config.level : stream.level;
-                } // end if
+                return arg;
+            }); // end map
 
-                // If you have turned on the `debugStream` option, we replace your standard stream with a pretty
-                // debug stream, so you don't have to pipe through the bunyan cli tool.
-                const debugStream = _.get(config, 'debugStream', config.debug);
-                if(debugStream)
-                {
-                    stream.type = 'raw';
-                    stream.serializers = bunyanDebugStream.serializers;
-                    stream.stream = bunyanDebugStream({
-                        basepath: this.mainDir,
-                        forceColor: true,
-                        showPid: false,
-                        colors: {
-                            'debug': 'white',
-                            'info': 'cyan',
-                        },
-                        prefixers: {
-                            module: (moduleName, options) => options.useColor ? colors.white(moduleName) : moduleName
-                        }
-                    });
-                } // end if
-            } // end if
+            // call the original
+            origFunc.apply(this, args);
+        };
+    } // end _modLogFunc
 
-            return stream;
-        });
+    init(config = { options: { level: 'debug' } })
+    {
+        // Build logging config
+        config.options = config.options || {};
+
+        // Environment variables need to override config
+        this._config = Object.assign({}, config);
+        this._config.nullLogger = !!process.env.LOG_NULL || config.nullLogger || false;
+        this._config.options = Object.assign({}, config.options);
+        this._config.options.level = (process.env.LOG_LEVEL || config.level || (config.debug ? 'debug' : 'info')).toLowerCase();
+        this._config.options.prettyPrint = config.options.prettyPrint
+            || (!!config.debug ? {
+                errorProps: '*',
+                levelFirst: false,
+                messageKey: 'msg',
+                timestampKey: 'time',
+                translateTime: 'mmmm dS h:MM:ss TT',
+            } : false);
 
         // Store a generic root logger.
         this.setRootLogger();
     } // end init
 
-    setRootLogger(name='root', options)
+    setRootLogger(name = 'root', options)
     {
         this.root = this._modLogger(this.getLogger(name, options));
     } // end setRootLogger
 
     getLogger(name, options)
     {
-        options = _.assign({
-            name,
-            streams: this.streams
-        }, options);
+        options = Object.assign({}, this._config.options, options, { name });
 
-        return this._modLogger(logging.createLogger(options));
+        const logger = this._config.nullLogger ? new NullLogger(name, options) : pino(options);
+        return this._modLogger(logger);
     } // end getLogger
 
     loggerFor(obj)

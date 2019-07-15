@@ -1,10 +1,9 @@
 # Trivial Logging
 
-This is a simple wrapper around bunyan, which provides some very basic convenience. It's designed to be a near
+This is a simple wrapper around [pino][], which provides some very basic convenience. It's designed to be a near
 drop-in replacement to [omega-logger][1], which in turn is based off of python's logging module.
 
-When I say a simple wrapper, I mean it's ~80 lines of code in my very verbose coding style. Mostly, it adds a simple way
-to configure bunyan, as well as the ability to trivially create loggers for modules.
+When I say a simple wrapper, I mean it's ~150 lines of code in my very verbose coding style. Mostly, it adds a simple way to configure [pino][], as well as the ability to trivially create loggers for modules.
 
 [1]: https://github.com/Morgul/omega-logger "gh:morgul/omega-logger"
 
@@ -22,30 +21,23 @@ In order to get basic logging going, you don't have to do anything:
 const logging = require('trivial-logging');
 const logger = logging.loggerFor(module);
 
-// This is just a bunyan logger instance
+// This is just a pino logger instance
 logger.info('Hello, World!');
 ```
 
-By default, this sets up a single `stdout` stream, logging at either `'debug'`, or whatever you've set the `LOG_LEVEL`
-environment variable to.
+By default, this logs JSON messages out to `stdout`, at either `'debug'`, or whatever you've set the `LOG_LEVEL` environment variable to.
 
 ## Advanced Usage
 
-We support passing in a configuration object to setup your logging streams. Then, all calls to `getLogger()` and/or
-`loggerFor()` will use that configuration.
+We support passing in a configuration object to setup your logger. This config supports several properties, including an `options` property that is passed directly to pino. All calls to `getLogger()` and/or `loggerFor()` will use the passed in configuration.
 
 ```javascript
 const logging = require('trivial-logging');
 
 const config = {
     debug: true,
-    logging: {
-        streams: [
-            {
-                stream: process.stdout,
-                level: "info"
-            }
-        ]
+    options: {
+        level: 'warn'
     }
 };
 
@@ -56,7 +48,7 @@ logging.init(config);
 const basicLogger = logging.getLogger('basic');
 
 // This gets a logger that has some options overridden
-const overriddenLogger = logging.getLogger('overridden', { streams: [ /* ... */ ] });
+const overriddenLogger = logging.getLogger('overridden', { level: 'debug' });
 ```
 
 ### Usage with Unit Tests
@@ -103,35 +95,32 @@ const logger = logging.getLogger('some logger');
 
 // All calls to this logger are noops
 logger.info("Some logging.");
-logger.fatal("Some other logging.");
+logger.error("Some other logging.");
 ```
 
 ## API
 
 ### `init(config)`
 
-* `config` - a configuration object with the keys `level`, `debugSteam` and/or `streams`.
+* `config` - a configuration object with the keys `debug`, `nullLogger` and/or `options`.
 
-This sets up all future loggers with a default set of streams, as passed by the configuration. If `config.level` is a valid logging level, it will force the `stdout` stream to log at _the lowest level_, either the stream's config, or the level specified by `config.level`.
-
-In addition, if `config.debugStream` (or if not present, `config.debug`) is `true` then we use [bunyan-debug-stream][] in place of `stdout`. The reason for this is simple: it's a pain (and sometimes not possible) to do `| bunyan` everywhere. This allows for beautiful debug logging, without much hassle, while still letting you shut off the pretty output when you deploy.
+This sets up all future loggers with a default set of options, as passed by the configuration. If `config.debug` is `true` then we turn on pino [pretty printing][pretty]. This allows for beautiful debug logging, without much hassle, while still letting you shut off the pretty output when you deploy.
 
 _Note: the `LOG_LEVEL` environment variable **always** overrides what's set in the config._
 
-[bunyan-debug-stream]: https://github.com/benbria/bunyan-debug-stream
+[pretty]: https://getpino.io/#/docs/pretty
 
 ### `setRootLogger(name)`
 
 * `name` - the name of the root logger (default: 'root').
 
 This creates a root logger that all other loggers are children of. This is called for you if `init()` had not been
-called previously, and you call either `getLogger` or `loggerFor`. It will be initialized with an `stdout` stream
-logging at debug.
+called previously, and you call either `getLogger` or `loggerFor`. It will be initialized with defaults.
 
 ### `getLogger(name, options)`
 
 * `name` - the name of the logger.
-* `options` - a configuration object to pass to bunyan. (default: `{ streams }` as passed to `init`)
+* `options` - a configuration object to pass to [pino][]. (default: `config.options` as passed to `init`)
 
 This gets a new child logger of the root logger, passing in the streams we've been configured with.
 
@@ -151,7 +140,9 @@ for module objects, but can be used on any arbitrary object.
 * `showHidden` - should we print hidden properties (default: `false`)
 
 This is basically just a wrapper around [util.inspect](https://nodejs.org/api/util.html#util_util_inspect_object_options).
+
 It's here for convenience, but doesn't have the same flexibility as `util.inspect`, so should only be used sparingly.
 
 _Note: This is added to all logging instances for your convenience._
 
+[pino]: https://getpino.io/
