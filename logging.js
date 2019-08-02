@@ -95,7 +95,8 @@ class LoggingService {
                 levelFirst: false,
                 messageKey: 'msg',
                 timestampKey: 'time',
-                translateTime: 'mmmm dS h:MM:ss TT',
+                translateTime: 'h:MM:ss TT',
+                ignore: 'pid,hostname'
             } : false);
 
         // Store a generic root logger.
@@ -134,7 +135,7 @@ class LoggingService {
 
         // Create a child logger, specifying the module we're logging for.
         const moduleName = path.relative(this.mainDir, filename);
-        return this._modLogger(this.root.child({ module: moduleName }));
+        return this.getLogger(moduleName);
     } // end loggerFor
 
     dump(obj, colors=true, depth=null, showHidden=false)
