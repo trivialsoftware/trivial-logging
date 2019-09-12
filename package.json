@@ -22,7 +22,7 @@
   "dependencies": {
     "pino": "^5.13.1"
   },
-  "devDependencies": {
+  "optionalDependencies": {
     "pino-pretty": "^3.2.0"
   }
 }
