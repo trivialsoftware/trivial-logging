@@ -104,7 +104,7 @@ logger.error("Some other logging.");
 
 * `config` - a configuration object with the keys `debug`, `nullLogger` and/or `options`.
 
-This sets up all future loggers with a default set of options, as passed by the configuration. If `config.debug` is `true` then we turn on pino [pretty printing][pretty]. This allows for beautiful debug logging, without much hassle, while still letting you shut off the pretty output when you deploy.
+This sets up all future loggers with a default set of options, as passed by the configuration. If `config.debug` is `true` then we turn on pino [pretty printing][pretty]. (`pino-pretty` must be installed, or this will have no effect!) This allows for beautiful debug logging, without much hassle, while still letting you shut off the pretty output when you deploy.
 
 _Note: the `LOG_LEVEL` environment variable **always** overrides what's set in the config._
 

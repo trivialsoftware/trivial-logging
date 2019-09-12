@@ -1,6 +1,6 @@
 {
   "name": "trivial-logging",
-  "version": "1.5.1",
+  "version": "2.0.0-rc.1",
   "description": "A simple wrapper around bunyan that provides some convenience.",
   "main": "logging.js",
   "scripts": {
@@ -20,9 +20,9 @@
   "author": "Christopher S. Case <chris.case@g33xnexus.com>",
   "license": "MIT",
   "dependencies": {
-    "pino": "^5.12.6"
+    "pino": "^5.13.1"
   },
-  "devDependencies": {
+  "optionalDependencies": {
     "pino-pretty": "^3.2.0"
   }
 }
