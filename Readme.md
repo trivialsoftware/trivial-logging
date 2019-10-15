@@ -100,6 +100,10 @@ logger.error("Some other logging.");
 
 ## API
 
+### `logger`
+
+A property that is just a reference to the default root logger.
+
 ### `init(config)`
 
 * `config` - a configuration object with the keys `debug`, `nullLogger` and/or `options`.
@@ -122,15 +126,19 @@ called previously, and you call either `getLogger` or `loggerFor`. It will be in
 * `name` - the name of the logger.
 * `options` - a configuration object to pass to [pino][]. (default: `config.options` as passed to `init`)
 
-This gets a new child logger of the root logger, passing in the streams we've been configured with.
+This gets a new logger, overriding default configuration options with `options`.
+
+### `child(metadata)`
+
+* `metadata` - Additional metadata for the child logger.
+
+This gets a new child logger of the root logger, appending the metadata to all calls.
 
 ### `loggerFor(object)`
 
 * `object` - an object to get a logger for, most commonly `module`, but supports any object, or a string.
 
-Creates a logger, appending a `module` object with either the name of the object, or a path to it. (It will attempt to
-get the filename of the object if the object has a `filename` property.) This makes it most useful for making loggers
-for module objects, but can be used on any arbitrary object.
+Creates a child logger, appending a `moduleName` object with either the name of the object, or a path to it. (It will attempt to get the filename of the object if the object has a `filename` property.) This makes it most useful for making loggers for module objects, but can be used on any arbitrary object.
 
 ## `dump(object, color, depth)`
 

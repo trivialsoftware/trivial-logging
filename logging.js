@@ -20,7 +20,8 @@ catch(_) { havePinoPretty = false; }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-class LoggingService {
+class TrivialLogger
+{
     constructor()
     {
         try
@@ -40,6 +41,14 @@ class LoggingService {
             },
         };
     } // end constructor
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Properties
+    //------------------------------------------------------------------------------------------------------------------
+
+    get logger(){ return this.root; }
+
+    //------------------------------------------------------------------------------------------------------------------
 
     _modLogger(logger)
     {
@@ -86,6 +95,8 @@ class LoggingService {
         };
     } // end _modLogFunc
 
+    //------------------------------------------------------------------------------------------------------------------
+
     init(config = { options: { level: 'debug' } })
     {
         // Build logging config
@@ -106,7 +117,7 @@ class LoggingService {
                     messageKey: 'msg',
                     timestampKey: 'time',
                     translateTime: 'h:MM:ss TT',
-                    ignore: 'pid,hostname'
+                    ignore: 'pid,hostname,moduleName'
                 } : false);
         } // end if
 
@@ -116,14 +127,30 @@ class LoggingService {
 
     setRootLogger(name = 'root', options)
     {
-        this.root = this._modLogger(this.getLogger(name, options));
+        this.root = this.getLogger(name, options);
+        return this.root;
     } // end setRootLogger
 
-    getLogger(name, options)
+    getLogger(name = 'logger', options)
     {
         options = Object.assign({}, this._config.options, options, { name });
+        const logger = this._config.nullLogger ? new NullLogger() : pino(options);
+        return this._modLogger(logger);
+    } // end getLogger
 
-        const logger = this._config.nullLogger ? new NullLogger(name, options) : pino(options);
+    child(metadata = {})
+    {
+        if(!this.root)
+        {
+            this.setRootLogger();
+        } // end if
+
+        if(typeof metadata === 'string')
+        {
+            metadata = { metadata };
+        } // end if
+
+        const logger = this.root.child(metadata);
         return this._modLogger(logger);
     } // end getLogger
 
@@ -139,24 +166,25 @@ class LoggingService {
             filename = obj;
         } // end if
 
-        if(!this.root)
-        {
-            this.setRootLogger();
-        } //end if
-
         // Create a child logger, specifying the module we're logging for.
         const moduleName = path.relative(this.mainDir, filename);
-        return this.getLogger(moduleName);
+
+        if(!this.root)
+        {
+            this.setRootLogger(moduleName);
+        } //end if
+
+        return this.root.child({ moduleName });
     } // end loggerFor
 
     dump(obj, colors=true, depth=null, showHidden=false)
     {
         return inspect(obj, { colors, depth, showHidden });
     } // end dump
-} // end LoggingService
+} // end TrivialLogger
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = new LoggingService();
+module.exports = new TrivialLogger();
 
 //----------------------------------------------------------------------------------------------------------------------
