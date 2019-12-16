@@ -2,33 +2,38 @@
 // Trivial Logging
 //----------------------------------------------------------------------------------------------------------------------
 
-const { inspect } = require('util');
-const path = require('path');
+import { inspect } from 'util';
+import path from 'path';
 
 // Pino
-const pino = require('pino');
+import pino from 'pino';
 
-// Null Logger
-const NullLogger = require('./lib/nullLogger');
+// Interfaces
+import { TrivialLogger } from './lib/interfaces/logger';
+import { LoggingConfig } from './lib/interfaces/config';
+import { LoggableError } from './lib/interfaces/error.js';
+
+// Null TrivialLogger
+import { NullLogger } from './lib/nullLogger';
 
 //----------------------------------------------------------------------------------------------------------------------
 
 // Try to import pino-pretty, and if we fail, we disable that functionality.
 let havePinoPretty = true;
 try { require('pino-pretty'); }
-catch(_) { havePinoPretty = false; }
+catch (_) { havePinoPretty = false; }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-class TrivialLogger
+export class TrivialLogging
 {
     constructor()
     {
         try
         {
-            this.mainDir = path.dirname(require.main.filename);
+            this.mainDir = path.dirname((require.main || {}).filename || '');
         }
-        catch(err)
+        catch (err)
         {
             // If you're requiring this from an interactive session, use the current working directory instead.
             this.mainDir = process.cwd();
@@ -38,19 +43,28 @@ class TrivialLogger
             nullLogger: !!process.env.LOG_NULL,
             options: {
                 level: (process.env.LOG_LEVEL || 'debug').toLowerCase()
-            },
+            }
         };
+
+        // Set a root logger
+        this.root = this.setRootLogger();
     } // end constructor
 
     //------------------------------------------------------------------------------------------------------------------
     // Properties
     //------------------------------------------------------------------------------------------------------------------
 
-    get logger(){ return this.root; }
+    private _config : LoggingConfig;
+    public mainDir : string;
+    public root : TrivialLogger;
 
     //------------------------------------------------------------------------------------------------------------------
 
-    _modLogger(logger)
+    get logger() : TrivialLogger { return this.root; }
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    private _modLogger(logger : TrivialLogger) : TrivialLogger
     {
         if(!logger.dump)
         {
@@ -64,12 +78,12 @@ class TrivialLogger
         return logger;
     } // end _modLogger
 
-    _modLogFunc(funcName, logger)
+    private _modLogFunc(funcName, logger) : void
     {
         const origFunc = logger[funcName];
-        logger[funcName] = function (...args)
+        logger[funcName] = function(...args)
         {
-            args = args.map((arg) =>
+            args = args.map((arg : LoggableError | object | string | number | boolean | null) =>
             {
                 if(arg instanceof Error)
                 {
@@ -97,21 +111,21 @@ class TrivialLogger
 
     //------------------------------------------------------------------------------------------------------------------
 
-    init(config = { options: { level: 'debug' } })
+    public init(config : LoggingConfig = { options: { level: 'debug' } }) : void
     {
         // Build logging config
         config.options = config.options || {};
 
         // Environment variables need to override config
-        this._config = Object.assign({}, config);
+        this._config = { ...config };
         this._config.nullLogger = !!process.env.LOG_NULL || config.nullLogger || false;
-        this._config.options = Object.assign({}, config.options);
+        this._config.options = { ...config.options };
         this._config.options.level = (process.env.LOG_LEVEL || config.level || (config.debug ? 'debug' : 'info')).toLowerCase();
 
         if(havePinoPretty)
         {
             this._config.options.prettyPrint = config.options.prettyPrint
-                || (!!config.debug ? {
+                || (config.debug ? {
                     errorProps: '*',
                     levelFirst: false,
                     messageKey: 'msg',
@@ -125,26 +139,21 @@ class TrivialLogger
         this.setRootLogger();
     } // end init
 
-    setRootLogger(name = 'root', options)
+    public setRootLogger(name = 'root', options ?: object) : TrivialLogger
     {
         this.root = this.getLogger(name, options);
         return this.root;
     } // end setRootLogger
 
-    getLogger(name = 'logger', options)
+    public getLogger(name = 'logger', options ?: object) : TrivialLogger
     {
-        options = Object.assign({}, this._config.options, options, { name });
+        options = { ...this._config.options, ...options, name };
         const logger = this._config.nullLogger ? new NullLogger() : pino(options);
         return this._modLogger(logger);
     } // end getLogger
 
-    child(metadata = {})
+    public child(metadata : object | string = {}) : TrivialLogger
     {
-        if(!this.root)
-        {
-            this.setRootLogger();
-        } // end if
-
         if(typeof metadata === 'string')
         {
             metadata = { metadata };
@@ -154,7 +163,7 @@ class TrivialLogger
         return this._modLogger(logger);
     } // end getLogger
 
-    loggerFor(obj)
+    public loggerFor(obj : any) : TrivialLogger
     {
         let filename;
         if(typeof obj === 'object' && obj.constructor.name === 'Module')
@@ -169,15 +178,10 @@ class TrivialLogger
         // Create a child logger, specifying the module we're logging for.
         const moduleName = path.relative(this.mainDir, filename);
 
-        if(!this.root)
-        {
-            this.setRootLogger(moduleName);
-        } //end if
-
-        return this.root.child({ moduleName });
+        return !this.root ? this.setRootLogger(moduleName) : this.root.child({ moduleName });
     } // end loggerFor
 
-    dump(obj, colors=true, depth=null, showHidden=false)
+    public dump(obj : object, colors = true, depth : number | null = null, showHidden = false) : string
     {
         return inspect(obj, { colors, depth, showHidden });
     } // end dump
@@ -185,6 +189,10 @@ class TrivialLogger
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = new TrivialLogger();
+const logging = new TrivialLogging();
+
+export { TrivialLogger, LoggingConfig, NullLogger };
+export default logging;
+module.exports = logging;
 
 //----------------------------------------------------------------------------------------------------------------------
