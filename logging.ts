@@ -25,6 +25,17 @@ catch (_) { havePinoPretty = false; }
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/**
+ * The main Trivial Logging api.
+ *
+ * This is a simple wrapper around [pino](https://getpino.io), which provides some very basic convenience. It's designed
+ * to be a near drop-in replacement to [omega-logger][1], which in turn is based off of python's logging module.
+ *
+ * When I say a simple wrapper, I mean it's ~150 lines of code in my very verbose coding style. Mostly, it adds a
+ * simple way to configure [pino](https://getpino.io), as well as the ability to trivially create loggers for modules.
+ *
+ * [1]: https://github.com/Morgul/omega-logger "gh:morgul/omega-logger"
+ */
 export class TrivialLogging
 {
     constructor()
@@ -156,12 +167,31 @@ export class TrivialLogging
         this.setRootLogger();
     } // end init
 
+    /**
+     * This creates a root logger that all other loggers are children of. This is called for you if `init()` had not
+     * been called previously, and you call either `getLogger` or `loggerFor`. It will be initialized with defaults.
+     *
+     * @param name - the name of the root logger (default: 'root').
+     * @param options - a configuration object to pass to [pino](https://getpino.io/). (default: `config.options` as
+     * passed to `init`)
+     *
+     * @returns A logger instance.
+     */
     public setRootLogger(name = 'root', options ?: object) : TrivialLogger
     {
         this.root = this.getLogger(name, options);
         return this.root;
     } // end setRootLogger
 
+    /**
+     * This gets a new logger, overriding default configuration options with `options`.
+     *
+     * @param name - the name of the logger.
+     * @param options - a configuration object to pass to [pino](https://getpino.io/). (default: `config.options` as
+     * passed to `init`)
+     *
+     * @returns A logger instance.
+     */
     public getLogger(name = 'logger', options ?: object) : TrivialLogger
     {
         options = { ...this._config.options, ...options, name };
@@ -169,6 +199,13 @@ export class TrivialLogging
         return this._modLogger(logger);
     } // end getLogger
 
+    /**
+     * This gets a new child logger of the root logger, appending the metadata to all calls.
+     *
+     * @param metadata - Additional metadata for the child logger.
+     *
+     * @returns A logger instance.
+     */
     public child(metadata : object | string = {}) : TrivialLogger
     {
         if(typeof metadata === 'string')
@@ -180,6 +217,15 @@ export class TrivialLogging
         return this._modLogger(logger);
     } // end getLogger
 
+    /**
+     * Creates a child logger, appending a `moduleName` object with either the name of the object, or a path to it. (It
+     * will attempt to get the filename of the object if the object has a `filename` property.) This makes it most
+     * useful for making loggers for module objects, but can be used on any arbitrary object.
+     *
+     * @param obj - an object to get a logger for, most commonly `module`, but supports any object, or a string.
+     *
+     * @returns A logger instance.
+     */
     public loggerFor(obj : any) : TrivialLogger
     {
         let filename;
@@ -198,6 +244,20 @@ export class TrivialLogging
         return !this.root ? this.setRootLogger(moduleName) : this.root.child({ moduleName });
     } // end loggerFor
 
+    /**
+     * This is basically just a wrapper around
+     * [util.inspect](https://nodejs.org/api/util.html#util_util_inspect_object_options). It's here for convenience,
+     * but doesn't have the same flexibility as `util.inspect`, so should only be used sparingly. \
+     *
+     * _Note: This is added to all logging instances for your convenience._
+     *
+     * @param obj - the object you wish to print
+     * @param colors - should the object be printed with color escapes (default: `true`)
+     * @param depth - how deeply nested should we print the properties of the object (default: `null`)
+     * @param showHidden - should we print hidden properties (default: `false`)
+     *
+     * @returns A formatted string version of the object.
+     */
     public dump(obj : object, colors = true, depth : number | null = null, showHidden = false) : string
     {
         return inspect(obj, { colors, depth, showHidden });
