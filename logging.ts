@@ -60,7 +60,12 @@ export class TrivialLogging
 
     //------------------------------------------------------------------------------------------------------------------
 
-    get logger() : TrivialLogger { return this.root; }
+    /**
+     * Gets a reference to the root logger.
+     *
+     * @returns A reference to the root logger.
+     */
+    public get logger() : TrivialLogger { return this.root; }
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -111,6 +116,18 @@ export class TrivialLogging
 
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * This sets up all future loggers with a default set of options, as passed by the configuration. If `config.debug`
+     * is `true` then we turn on pino [pretty printing][pretty]. (`pino-pretty` must be installed, or this will have no
+     * effect!) This allows for beautiful debug logging, without much hassle, while still letting you shut off the
+     * pretty output when you deploy.
+     *
+     * _Note: the `LOG_LEVEL` environment variable **always** overrides what's set in the config._
+     *
+     * [pretty]: https://getpino.io/#/docs/pretty
+     *
+     * @param config - a configuration object with the keys `debug`, `nullLogger` and/or `options`.
+     */
     public init(config : LoggingConfig = { options: { level: 'debug' } }) : void
     {
         // Build logging config
