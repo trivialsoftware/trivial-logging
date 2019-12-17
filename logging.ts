@@ -65,8 +65,19 @@ export class TrivialLogging
     // Properties
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Internal config.
+     */
     private _config : LoggingConfig;
+
+    /**
+     * The root directory of the project, as detected by Trivial Logging.
+     */
     public mainDir : string;
+
+    /**
+     * The root logger.
+     */
     public root : TrivialLogger;
 
     //------------------------------------------------------------------------------------------------------------------

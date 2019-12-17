@@ -8,6 +8,12 @@ import { EventEmitter } from 'events';
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/**
+ * The null logger.
+ *
+ * This logger is, in essence, an 'empty' logger, which should be compliant with the logging interface, but also be, in
+ * essence, a no-op for everything.
+ */
 export class NullLogger extends EventEmitter implements TrivialLogger
 {
     customLevels = {};
