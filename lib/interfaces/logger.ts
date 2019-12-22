@@ -2,12 +2,19 @@
 // Logger interface
 // ---------------------------------------------------------------------------------------------------------------------
 
-import { BaseLogger } from 'pino';
+import { BaseLogger, LogFn } from 'pino';
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 interface InternalLogger
 {
+    trace : LogFn;
+    debug : LogFn;
+    info : LogFn;
+    warn : LogFn;
+    error : LogFn;
+    fatal : LogFn;
+
     dump ?: (obj : any, colors ?: boolean, depth ?: number | null, showHidden ?: boolean) => string;
 } // end InternalLogger
 
