@@ -1,6 +1,6 @@
 {
   "name": "trivial-logging",
-  "version": "2.0.0-rc.7",
+  "version": "2.0.0-rc.8",
   "description": "A simple wrapper around bunyan that provides some convenience.",
   "main": "dist/logging.js",
   "types": "dist/logging.d.ts",
