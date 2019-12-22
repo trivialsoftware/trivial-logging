@@ -18,8 +18,7 @@ jobs:
       - uses: mathrix-education/sonar-scanner@master
         with:
           version: 4.2.0.1873 # required
-          options:
-            - "-Dsonar.login=${SONAR_TOKEN}"
+          options: "-Dsonar.login=${SONAR_TOKEN}"
           typescript: true
           scan: true
           args: --debug
