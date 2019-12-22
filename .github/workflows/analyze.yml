@@ -13,12 +13,11 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
+      - run: yarn
+      - run: yarn
       - uses: mathrix-education/sonar-scanner@master
         with:
           version: 4.2.0.1873 # required
           typescript: true
           scan: true
-          unshallow: true
           args: --debug
-      - run: yarn
-      - run: yarn build
