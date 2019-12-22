@@ -1,0 +1,24 @@
+name: analyze
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  scanner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - uses: mathrix-education/sonar-scanner@master
+        with:
+          version: 4.2.0.1873 # required
+          typescript: true
+          scan: true
+          unshallow: true
+          args: --debug
+      - run: yarn
+      - run: yarn build
