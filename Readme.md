@@ -1,5 +1,12 @@
 # Trivial Logging
 
+[![Quality Gate Status](https://swmetrics.skewedaspect.com/api/project_badges/measure?project=trivial-logging&metric=alert_status)](https://swmetrics.skewedaspect.com/dashboard?id=trivial-logging)
+[![Code Smells](https://swmetrics.skewedaspect.com/api/project_badges/measure?project=trivial-logging&metric=code_smells)](https://swmetrics.skewedaspect.com/dashboard?id=trivial-logging)
+[![Bugs](https://swmetrics.skewedaspect.com/api/project_badges/measure?project=trivial-logging&metric=bugs)](https://swmetrics.skewedaspect.com/dashboard?id=trivial-logging)
+[![Maintainability Rating](https://swmetrics.skewedaspect.com/api/project_badges/measure?project=trivial-logging&metric=sqale_rating)](https://swmetrics.skewedaspect.com/dashboard?id=trivial-logging)
+[![Reliability Rating](https://swmetrics.skewedaspect.com/api/project_badges/measure?project=trivial-logging&metric=reliability_rating)](https://swmetrics.skewedaspect.com/dashboard?id=trivial-logging)
+[![Security Rating](https://swmetrics.skewedaspect.com/api/project_badges/measure?project=trivial-logging&metric=security_rating)](https://swmetrics.skewedaspect.com/dashboard?id=trivial-logging)
+
 This is a simple wrapper around [pino][], which provides some very basic convenience. It's designed to be a near
 drop-in replacement to [omega-logger][1], which in turn is based off of python's logging module.
 
