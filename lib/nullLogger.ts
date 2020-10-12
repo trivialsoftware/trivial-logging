@@ -21,9 +21,9 @@ export class NullLogger extends EventEmitter implements TrivialLogger
     LOG_VERSION = 1;
     version = '1.0.0'
 
-    bindings() : object { return {}; }
+    bindings() : Record<string, unknown> { return {}; }
 
-    child(_) : any { return new NullLogger() as any; }
+    child() : any { return new NullLogger() as any; }
 
     flush() : void { return undefined; }
 
@@ -53,7 +53,7 @@ export class NullLogger extends EventEmitter implements TrivialLogger
         return false;
     }
 
-    dump(obj : object, colors = true, depth : number | null = null, showHidden = false) : string
+    dump(obj : Record<string, unknown>, colors = true, depth : number | null = null, showHidden = false) : string
     {
         return inspect(obj, { colors, depth, showHidden });
     } // end dump
