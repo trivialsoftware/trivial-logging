@@ -19,6 +19,7 @@ export class NullLogger extends EventEmitter implements TrivialLogger
     customLevels = {};
     level = 'info';
     LOG_VERSION = 1;
+    version = '1.0.0'
 
     bindings() : object { return {}; }
 
@@ -39,12 +40,18 @@ export class NullLogger extends EventEmitter implements TrivialLogger
     useOnlyCustomLevels = false;
 
     // Logging API
+    silent() : void { return undefined; }
     trace() : void { return undefined; }
     debug() : void { return undefined; }
     info() : void { return undefined; }
     warn() : void { return undefined; }
     error() : void { return undefined; }
     fatal() : void { return undefined; }
+
+    addLevel() : boolean
+    {
+        return false;
+    }
 
     dump(obj : object, colors = true, depth : number | null = null, showHidden = false) : string
     {
