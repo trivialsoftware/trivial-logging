@@ -15,7 +15,7 @@ interface InternalLogger
     error : LogFn;
     fatal : LogFn;
 
-    dump ?: (obj : any, colors ?: boolean, depth ?: number | null, showHidden ?: boolean) => string;
+    dump ?: (obj : Record<string, unknown>, colors ?: boolean, depth ?: number | null, showHidden ?: boolean) => string;
 } // end InternalLogger
 
 // ---------------------------------------------------------------------------------------------------------------------

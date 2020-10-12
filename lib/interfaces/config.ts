@@ -5,7 +5,7 @@
 interface ConfigOptions
 {
 	level ?: string;
-	prettyPrint ?: boolean | object;
+	prettyPrint ?: boolean | Record<string, unknown>;
 } // end ConfigOptions
 
 export interface LoggingConfig

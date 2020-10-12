@@ -98,9 +98,21 @@ export class TrivialLogging
             logger.dump = this.dump;
         } // end if
 
-        // Modify logger functions to handle errors correctly.
-        this._modLogFunc('warn', logger);
-        this._modLogFunc('error', logger);
+        // Modify logger functions to handle errors correctly, and restore old multi argument behavior.
+        const logFuns = [
+            'silent',
+            'trace',
+            'debug',
+            'info',
+            'warn',
+            'error',
+            'fatal'
+        ];
+
+        logFuns.forEach((logFunName) =>
+        {
+            this._modLogFunc(logFunName, logger);
+        });
 
         return logger;
     } // end _modLogger
@@ -110,7 +122,7 @@ export class TrivialLogging
         const origFunc = logger[funcName];
         logger[funcName] = function(...args)
         {
-            args = args.map((arg : LoggableError | object | string | number | boolean | null) =>
+            args = args.map((arg : LoggableError | Record<string, unknown> | string | number | boolean | null) =>
             {
                 if(arg instanceof Error)
                 {
@@ -130,6 +142,21 @@ export class TrivialLogging
 
                 return arg;
             }); // end map
+
+            if(args.length > 1)
+            {
+                for(let idx = 1; idx < args.length; idx++)
+                {
+                    if(typeof args[idx] === 'string')
+                    {
+                        args[0] += ' %s';
+                    }
+                    else
+                    {
+                        args[0] += ' %j';
+                    } // end if
+                } // end for
+            } // end if
 
             // call the original
             origFunc.apply(this, args);
@@ -188,7 +215,7 @@ export class TrivialLogging
      *
      * @returns A logger instance.
      */
-    public setRootLogger(name = 'root', options ?: object) : TrivialLogger
+    public setRootLogger(name = 'root', options ?: Record<string, unknown>) : TrivialLogger
     {
         this.root = this.getLogger(name, options);
         return this.root;
@@ -203,7 +230,7 @@ export class TrivialLogging
      *
      * @returns A logger instance.
      */
-    public getLogger(name = 'logger', options ?: object) : TrivialLogger
+    public getLogger(name = 'logger', options ?: Record<string, unknown>) : TrivialLogger
     {
         options = { ...this._config.options, ...options, name };
         const logger = this._config.nullLogger ? new NullLogger() : pino(options);
@@ -217,7 +244,7 @@ export class TrivialLogging
      *
      * @returns A logger instance.
      */
-    public child(metadata : object | string = {}) : TrivialLogger
+    public child(metadata : Record<string, unknown> | string = {}) : TrivialLogger
     {
         if(typeof metadata === 'string')
         {
@@ -269,7 +296,7 @@ export class TrivialLogging
      *
      * @returns A formatted string version of the object.
      */
-    public dump(obj : object, colors = true, depth : number | null = null, showHidden = false) : string
+    public dump(obj : Record<string, unknown>, colors = true, depth : number | null = null, showHidden = false) : string
     {
         return inspect(obj, { colors, depth, showHidden });
     } // end dump
