@@ -5,7 +5,7 @@
 export interface Loggable
 {
 	code ?: string;
-	toJSON ?: () => object;
+	toJSON ?: () => Record<string, unknown>;
 }
 
 export type LoggableError = Error & Loggable;

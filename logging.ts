@@ -110,7 +110,7 @@ export class TrivialLogging
         const origFunc = logger[funcName];
         logger[funcName] = function(...args)
         {
-            args = args.map((arg : LoggableError | object | string | number | boolean | null) =>
+            args = args.map((arg : LoggableError | Record<string, unknown> | string | number | boolean | null) =>
             {
                 if(arg instanceof Error)
                 {
@@ -188,7 +188,7 @@ export class TrivialLogging
      *
      * @returns A logger instance.
      */
-    public setRootLogger(name = 'root', options ?: object) : TrivialLogger
+    public setRootLogger(name = 'root', options ?: Record<string, unknown>) : TrivialLogger
     {
         this.root = this.getLogger(name, options);
         return this.root;
@@ -203,7 +203,7 @@ export class TrivialLogging
      *
      * @returns A logger instance.
      */
-    public getLogger(name = 'logger', options ?: object) : TrivialLogger
+    public getLogger(name = 'logger', options ?: Record<string, unknown>) : TrivialLogger
     {
         options = { ...this._config.options, ...options, name };
         const logger = this._config.nullLogger ? new NullLogger() : pino(options);
@@ -217,7 +217,7 @@ export class TrivialLogging
      *
      * @returns A logger instance.
      */
-    public child(metadata : object | string = {}) : TrivialLogger
+    public child(metadata : Record<string, unknown> | string = {}) : TrivialLogger
     {
         if(typeof metadata === 'string')
         {
@@ -237,12 +237,12 @@ export class TrivialLogging
      *
      * @returns A logger instance.
      */
-    public loggerFor(obj : any) : TrivialLogger
+    public loggerFor(obj : unknown) : TrivialLogger
     {
         let filename;
-        if(typeof obj === 'object' && obj.constructor.name === 'Module')
+        if(obj && typeof obj === 'object' && obj.constructor.name === 'Module')
         {
-            filename = obj.filename;
+            filename = (obj as Record<string, unknown>)?.filename;
         }
         else if(typeof obj === 'string')
         {
@@ -269,7 +269,7 @@ export class TrivialLogging
      *
      * @returns A formatted string version of the object.
      */
-    public dump(obj : object, colors = true, depth : number | null = null, showHidden = false) : string
+    public dump(obj : Record<string, unknown>, colors = true, depth : number | null = null, showHidden = false) : string
     {
         return inspect(obj, { colors, depth, showHidden });
     } // end dump
