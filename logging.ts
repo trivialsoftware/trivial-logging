@@ -170,7 +170,7 @@ export class TrivialLogging
                     messageKey: 'msg',
                     timestampKey: 'time',
                     translateTime: 'h:MM:ss TT',
-                    ignore: 'pid,hostname,moduleName'
+                    ignore: 'pid,hostname,moduleName,v'
                 } : false);
         } // end if
 
